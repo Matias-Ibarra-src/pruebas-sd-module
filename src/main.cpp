@@ -3,56 +3,66 @@
 
 File myFile;
 
-void writeFileSD( char * name , char * content){
+// ¿ /sd es el root ?
 
-  myFile = SD.open(name, "w");
+void writeFileSD( String name , String content){
+
+  myFile = SD.open(name.c_str(), "w");
   if (!myFile){ 
-    Serial.println("File couldn't be created"); 
+    Serial.println("[FAIL] : File couldn't be created"); 
   } 
-  if (myFile.print("Writing in file test")){ 
-    Serial.println("File wrote correctly"); 
+  if (myFile.print(content.c_str())){ 
+    Serial.println("[SUCCESS] : File wrote correctly"); 
     myFile.close();
   } else{ 
-    Serial.println("Error writing file");
+    Serial.println("[FAIL] : Error writing file");
     myFile.close();
   }
 }
 
-void readFileSD( char * name ){
-
-  myFile = SD.open(name, "r");
-  if (!myFile){
-    Serial.println("Error opening file");
+void CreateDirectory(String DirName){
+  if(SD.mkdir(DirName.c_str())){
+    Serial.println("[SUCCESS] : Directory was created");
+  }else{
+    Serial.println("[FAIL] : directory wasn´t created"); 
   }
-  Serial.println("File content: ");
+}
+
+void readFileSD(String name ){
+
+  myFile = SD.open(name.c_str(), "r");
+  if (!myFile){
+    Serial.println("[FAIL] : Error opening file");
+  }
+  Serial.println("[SUCCESS] : File content: ");
   while(myFile.available()){
     Serial.write(myFile.read());
   }
   myFile.close();
 }
 
-void removeFileSD( char * name){
+void removeFileSD(String name){
 
-  if (SD.remove(name)){
-    Serial.println("File removed");
+  if (SD.remove(name.c_str())){
+    Serial.println("[SUCCESS] : File removed");
   } else{
-    Serial.println("File couldn't be removed");
+    Serial.println("[FAIL] : File couldn't be removed");
   }
 }
 
 
 void setup() {
   Serial.begin(9600);
-  Serial.print("Iniciando SD ...");
+  Serial.print("Starting SD...");
   if (!SD.begin(5)) {
-    Serial.println("No se pudo inicializar");
+    Serial.println("[FAIL] : Not inicialized");
     return;
   }
-  Serial.println("inicializacion exitosa");
-  writeFileSD("/Mati.txt", "This is a test");
-  readFileSD("/Mati.txt");
+  Serial.println("Success initialization");
 }
 
 void loop() {
-
+  readFileSD("/Mati.txt");
+  removeFileSD("/Mati.txt");
+  delay(20000000);
 }
