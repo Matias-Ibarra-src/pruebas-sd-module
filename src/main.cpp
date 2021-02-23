@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <SD.h>
+#include <ArduinoJson.h>
+#include "SPIFFS.h"
 
 File myFile;
 
@@ -112,18 +114,26 @@ void removeFileSD(String FileName){
 
 void writeCSV(String content){
   const size_t size = strlen(content.c_str()) * sizeof(int);
-  File myFile = SD.open("Packages.csv", "a");
+  myFile = SD.open("/Packages.csv", "a");
   DynamicJsonDocument doc(size);
   deserializeJson(doc, content);
-
+  char buffer[256];
+  
   JsonArray sensors = doc["s"];
   for(JsonArray array : sensors){
     for (JsonObject objects : array){
-      char *id = objects["i"];
-      char *data = objects["d"]; 
-      myFile.printf("%s%c%s%c\n", id, ',', data, ';');
+      const char *id = objects["i"];
+      const char *data = objects["d"]; 
+      Serial.println(id);
+      Serial.println(data);
+      Serial.println("1");
+      sprintf(buffer, "%s%c%s%c", id, ',', data, ';');
+      Serial.println("2");
+      myFile.println(buffer);
+      Serial.println("3");
     }
   }
+  Serial.println("4");
   myFile.close();
 }
 
@@ -198,29 +208,26 @@ void setup() {
     return;
   }
   Serial.println("Success initialization");
-  
+  delay(5000);
   writeCSV(Package);
-  
-  writeFileSD( "/counter.dat" , "0", "w");
+  Serial.println("0");
 }
 
 void loop() {
-  File myFile = SD.open("/counter.dat", "r");
+  myFile = SD.open("/counter.dat", "r");
   String character;
   int fileCount;
-  
   while(myFile.available()){
     character = myFile.read();
   }
   
-  
   fileCount = atoi(character.c_str()); 
-  
   fileCount += 1;
   character = (String)(fileCount);
   myFile.close();
   writeFileSD( "/counter.dat" , character, "w");
   readFileSD( "/counter.dat");
+  readFileSD("/Packages.csv");
   //removeFileSD("/counter.dat");
 
   writeFileSD("/Config/Config.json","{\"ds\":1200}", "a");
