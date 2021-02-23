@@ -103,8 +103,21 @@ void removeFileSD(String FileName){
   }
 }
 
-void writeJSON(String content){
-  
+void writeCSV(String content){
+  const size_t size = strlen(content.c_str()) * sizeof(int);
+  File myFile = SD.open("Packages.csv", "a");
+  DynamicJsonDocument doc(size);
+  deserializeJson(doc, content);
+
+  JsonArray sensors = doc["s"];
+  for(JsonArray array : sensors){
+    for (JsonObject objects : array){
+      char *id = objects["i"];
+      char *data = objects["d"]; 
+      myFile.printf("%s%c%s%c\n", id, ',', data, ';');
+    }
+  }
+  myFile.close();
 }
 
 
@@ -117,6 +130,9 @@ void setup() {
     return;
   }
   Serial.println("Success initialization");
+  
+  writeCSV(Package);
+  
   writeFileSD( "/counter.dat" , "0", "w");
 }
 
