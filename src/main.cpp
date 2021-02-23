@@ -2,14 +2,21 @@
 #include <SD.h>
 
 File myFile;
+
+
 enum TypeOfFile {
   txt = 1,
   json,
   dat
 };
 
+const char *filesSPIFF[] = {
+  "/_id", 
+  "/environment.json", 
+  "/config.json", 
+  "/failedPackages.json"
+}; 
 
-// ¿ /sd es el root ? R: yes 
 
 float DummyRead(){
   float numero;
@@ -32,7 +39,7 @@ void writeFileSD( String FileName , String content, String mode){
   
   int counter;
 
-  myFile = SD.open(FileName.c_str(), mode);
+  myFile = SD.open(FileName.c_str(), mode.c_str());
   if (!myFile){ 
     Serial.println("[FAIL] : File couldn't be created"); 
   } 
@@ -120,9 +127,70 @@ void writeCSV(String content){
   myFile.close();
 }
 
+// INDIVIDUAL PARA PRUEBAS ///
+
+String readMemoryId(){
+  File file = SPIFFS.open("/_id");
+  return file.readString();
+}
+
+String readMemoryEnvironment(){
+  File file = SPIFFS.open("/environment.json");
+  return file.readString();
+}
+
+String readMemoryConfig(){
+  File file = SPIFFS.open("/config.json");
+  return file.readString();
+}
+
+String readMemoryPeripherals(){
+  File file = SPIFFS.open("/peripherals.json");
+  return file.readString();
+}
+
+
+void cloneToSD(String fileName){
+  
+  String content = readMemoryId();  
+  writeFileSD(fileName, content, "w");
+  readFileSD(fileName);
+
+}
+
+void cloneAllToSD(){
+
+  String content;
+  char mode[] = "w";
+  
+  content = readMemoryId();
+  writeFileSD(filesSPIFF[0], content, mode);
+
+  content = readMemoryEnvironment();
+  writeFileSD(filesSPIFF[1], content, mode);
+
+  content = readMemoryConfig();
+  writeFileSD(filesSPIFF[2], content, mode);
+
+  content = readMemoryPeripherals();
+  writeFileSD(filesSPIFF[3], content, mode);
+}
+
+void readAllCopied(){
+
+  for (String name : filesSPIFF){
+    readFileSD(name);
+  }
+
+}
+
+////////////////////////////////
+
+
+
 
 void setup() {
-  String Package = "{\"s\":[[{\"i\":1,\"d\":25.3}]]}"
+  String Package = "{\"s\":[[{\"i\":1,\"d\":25.3}]]}";
   Serial.begin(9600);
   Serial.print("Starting SD...");
   if (!SD.begin(5)) {
@@ -137,7 +205,7 @@ void setup() {
 }
 
 void loop() {
-  File MyFileCount = SD.open("/counter.dat", "r");
+  File myFile = SD.open("/counter.dat", "r");
   String character;
   int fileCount;
   
@@ -150,7 +218,7 @@ void loop() {
   
   fileCount += 1;
   character = (String)(fileCount);
-  MyFileCount.close();
+  myFile.close();
   writeFileSD( "/counter.dat" , character, "w");
   readFileSD( "/counter.dat");
   //removeFileSD("/counter.dat");
@@ -163,4 +231,4 @@ void loop() {
 
 
 //{"s":[[{"i":1,"d":25.3},...]]}
-i,1,d,25.3;
+//i,1,d,25.3;
