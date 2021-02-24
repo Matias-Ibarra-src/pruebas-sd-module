@@ -113,27 +113,28 @@ void removeFileSD(String FileName){
 }
 
 void writeCSV(String content){
-  const size_t size = strlen(content.c_str()) * sizeof(int);
-  myFile = SD.open("/Packages.csv", "a");
-  DynamicJsonDocument doc(size);
-  deserializeJson(doc, content);
-  char buffer[256];
+  //{"s":[[{"i":1,"d":25.3},...]]}
+  String token;
+  String id;
+  String data;
   
-  JsonArray sensors = doc["s"];
-  for(JsonArray array : sensors){
-    for (JsonObject objects : array){
-      const char *id = objects["i"];
-      const char *data = objects["d"]; 
-      Serial.println(id);
-      Serial.println(data);
-      Serial.println("1");
-      sprintf(buffer, "%s%c%s%c", id, ',', data, ';');
-      Serial.println("2");
-      myFile.println(buffer);
-      Serial.println("3");
-    }
+  unsigned int first;
+  unsigned int last;
+  
+  myFile = SD.open("/Packages.csv", "a");
+  
+  while(strchr(content, ':') != NULL){
+    token.find_first_of();
+    id = token;
+    Serial.print(id);
   }
-  Serial.println("4");
+
+
+
+
+
+
+
   myFile.close();
 }
 
