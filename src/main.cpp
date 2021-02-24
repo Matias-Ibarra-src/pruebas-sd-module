@@ -117,24 +117,31 @@ void writeCSV(String content){
   String token;
   String id;
   String data;
-  
+  String toPrint;
+  char __TOP_LIMIT__ = ':';
+  char __BOTTOM_LIMIT__ = ',';
   unsigned int first;
   unsigned int last;
   
   myFile = SD.open("/Packages.csv", "a");
   
-  while(strchr(content, ':') != NULL){
-    token.find_first_of();
+  while(strchr(content.c_str(), __TOP_LIMIT__) != NULL){
+    toPrint = "";
+    
+    first = content.indexOf(__TOP_LIMIT__);
+    last  = content.indexOf(__BOTTOM_LIMIT__);
+    token = content.substring(first+1,last);
     id = token;
-    Serial.print(id);
+
+    content = content.substring(last+1);
+    first = content.indexOf(__TOP_LIMIT__);
+    last  = content.indexOf(__BOTTOM_LIMIT__);
+    token = content.substring(first+1,last);
+    data = token;
+    
+    toPrint = id+","+data+";";
+    myFile.println(toPrint);    
   }
-
-
-
-
-
-
-
   myFile.close();
 }
 
