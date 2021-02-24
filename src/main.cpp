@@ -112,6 +112,9 @@ void removeFileSD(String FileName){
   }
 }
 
+/*
+* Writes a CSV file from content
+*/
 void writeCSV(String content){
   //{"s":[[{"i":1,"d":25.3},...]]}
   String token;
@@ -124,10 +127,10 @@ void writeCSV(String content){
   unsigned int last;
   
   myFile = SD.open("/Packages.csv", "a");
-  
+  content = content.substring(6);
   while(strchr(content.c_str(), __TOP_LIMIT__) != NULL){
     toPrint = "";
-    
+    //{"s":[[{"i":1,"d":25.3},{"i":2,"d":26.3}]]}
     first = content.indexOf(__TOP_LIMIT__);
     last  = content.indexOf(__BOTTOM_LIMIT__);
     token = content.substring(first+1,last);
@@ -139,13 +142,11 @@ void writeCSV(String content){
     token = content.substring(first+1,last);
     data = token;
     
-    toPrint = id+","+data+";";
+    toPrint = 'i'+','+id+','+"d"+','+data+',';
     myFile.println(toPrint);    
   }
   myFile.close();
 }
-
-// INDIVIDUAL PARA PRUEBAS ///
 
 String readMemoryId(){
   File file = SPIFFS.open("/_id");
@@ -167,8 +168,47 @@ String readMemoryPeripherals(){
   return file.readString();
 }
 
+////////////////////////////////
 
-void cloneToSD(String fileName){
+/*
+*  Updates SD datalog
+*/
+void dataLogUpdate(String fileName, DynamicJsonDocument doc){
+  myFile = SD.open(fileName, "a");
+  myFile.println("");
+  serializeJson(doc,myFile);
+
+  myFile.close();
+}
+
+void updateMemoryConfig(DynamicJsonDocument doc){
+  File file = SPIFFS.open("/config.json", "w");
+  serializeJson(doc, file);
+  
+  dataLogUpdate("/config.json", doc);
+}
+
+void updateMemoryPeripherals(DynamicJsonDocument doc){
+  File file = SPIFFS.open("/peripherals.json", "w");
+  serializeJson(doc, file);
+
+  dataLogUpdate("/peripherals.json", doc);
+}
+
+void updateFailedPackages(DynamicJsonDocument doc){
+  File file = SPIFFS.open("/failedPackages.json", "w");
+  serializeJson(doc, file);
+
+  dataLogUpdate("/failedPackages.json", doc);
+}
+
+////////////////////////////////
+
+
+/*
+/ Clones "/_id" to the SD memory
+*/ 
+void cloneToSD(String fileName = "/_id"){
   
   String content = readMemoryId();  
   writeFileSD(fileName, content, "w");
@@ -176,6 +216,9 @@ void cloneToSD(String fileName){
 
 }
 
+/*
+* Clones all of the files in filesSPIFF to the SD memory
+*/
 void cloneAllToSD(){
 
   String content;
@@ -194,6 +237,9 @@ void cloneAllToSD(){
   writeFileSD(filesSPIFF[3], content, mode);
 }
 
+/*
+* Reads all of the files from filesSPIFF that are in the SD memory
+*/
 void readAllCopied(){
 
   for (String name : filesSPIFF){
@@ -233,6 +279,8 @@ void loop() {
   fileCount += 1;
   character = (String)(fileCount);
   myFile.close();
+  
+  
   writeFileSD( "/counter.dat" , character, "w");
   readFileSD( "/counter.dat");
   readFileSD("/Packages.csv");
@@ -240,6 +288,10 @@ void loop() {
 
   writeFileSD("/Config/Config.json","{\"ds\":1200}", "a");
   readFileSD("/Config/Config.json");
+  
+  cloneToSD();
+  readFileSD("/_id");
+  
   //removeFileSD("/Config/Config.json");
   delay(5000);
 }
