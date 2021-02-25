@@ -120,7 +120,7 @@ void writeCSV(String content){
   String token;
   String id;
   String data;
-  String toPrint;
+  String toPrint = "";
   char __TOP_LIMIT__ = ':';
   char __BOTTOM_LIMIT__ = ',';
   char __BOTTOM_LIMIT_2__ = '}';
@@ -131,8 +131,6 @@ void writeCSV(String content){
   content = content.substring(6);
 
   while(strchr(content.c_str(), __TOP_LIMIT__) != NULL){
-    Serial.println(content);
-    toPrint = "";
     //{"s":[[{"i":1,"d":25.3},{"i":2,"d":26.3}]]}
     first = content.indexOf(__TOP_LIMIT__);
     last  = content.indexOf(__BOTTOM_LIMIT__);
@@ -146,9 +144,10 @@ void writeCSV(String content){
     data = token;
     content = content.substring(last+2);
 
-    toPrint = ("i,"+id+",d,"+data+';');
-    myFile.println(toPrint);
+    toPrint += ("i,"+id+",d,"+data+';');
+    
   }
+  myFile.println(toPrint);
   myFile.close();
 }
 
