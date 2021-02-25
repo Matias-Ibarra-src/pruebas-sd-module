@@ -123,12 +123,15 @@ void writeCSV(String content){
   String toPrint;
   char __TOP_LIMIT__ = ':';
   char __BOTTOM_LIMIT__ = ',';
+  char __BOTTOM_LIMIT_2__ = '}';
   unsigned int first;
   unsigned int last;
   
-  myFile = SD.open("/Packages.csv", "a");
+  myFile = SD.open("/Packages.txt", "a");
   content = content.substring(6);
+
   while(strchr(content.c_str(), __TOP_LIMIT__) != NULL){
+    Serial.println(content);
     toPrint = "";
     //{"s":[[{"i":1,"d":25.3},{"i":2,"d":26.3}]]}
     first = content.indexOf(__TOP_LIMIT__);
@@ -138,12 +141,13 @@ void writeCSV(String content){
 
     content = content.substring(last+1);
     first = content.indexOf(__TOP_LIMIT__);
-    last  = content.indexOf(__BOTTOM_LIMIT__);
+    last  = content.indexOf(__BOTTOM_LIMIT_2__);
     token = content.substring(first+1,last);
     data = token;
-    
-    toPrint = 'i'+','+id+','+"d"+','+data+',';
-    myFile.println(toPrint);    
+    content = content.substring(last+2);
+
+    toPrint = ("i,"+id+",d,"+data+';');
+    myFile.println(toPrint);
   }
   myFile.close();
 }
@@ -249,11 +253,8 @@ void readAllCopied(){
 
 ////////////////////////////////
 
-
-
-
 void setup() {
-  String Package = "{\"s\":[[{\"i\":1,\"d\":25.3}]]}";
+  String Package = "{\"s\":[[{\"i\":1,\"d\":25.3},{\"i\":2,\"d\":22.3},{\"i\":3,\"d\":24}]]}";
   Serial.begin(9600);
   Serial.print("Starting SD...");
   if (!SD.begin(5)) {
@@ -262,11 +263,22 @@ void setup() {
   }
   Serial.println("Success initialization");
   delay(5000);
+  
+  removeFileSD("/Packages.txt");
+  
   writeCSV(Package);
-  Serial.println("0");
+  //removeFileSD("/_id");
+  
+  /**
+  removeFileSD("/counter.dat");
+  removeFileSD("/Config/Config.json");
+  */
+  
+  
 }
 
 void loop() {
+  /**
   myFile = SD.open("/counter.dat", "r");
   String character;
   int fileCount;
@@ -281,16 +293,17 @@ void loop() {
   
   
   writeFileSD( "/counter.dat" , character, "w");
-  readFileSD( "/counter.dat");
-  readFileSD("/Packages.csv");
+  readFileSD( "/counter.dat");*/
+  readFileSD("/Packages.txt");
   //removeFileSD("/counter.dat");
-
+  /**
   writeFileSD("/Config/Config.json","{\"ds\":1200}", "a");
   readFileSD("/Config/Config.json");
-  
+  */
+  /**
   cloneToSD();
   readFileSD("/_id");
-  
+  */
   //removeFileSD("/Config/Config.json");
   delay(5000);
 }
