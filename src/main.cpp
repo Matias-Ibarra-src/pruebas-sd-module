@@ -5,7 +5,6 @@
 
 File myFile;
 
-
 enum TypeOfFile {
   txt = 1,
   json,
@@ -19,6 +18,9 @@ const char *filesSPIFF[] = {
   "/failedPackages.json"
 }; 
 
+bool beginMemory(){
+  return SPIFFS.begin(true);
+}
 
 float DummyRead(){
   float numero;
@@ -210,12 +212,14 @@ void updateFailedPackages(DynamicJsonDocument doc){
 /*
 / Clones "/_id" to the SD memory
 */ 
-void cloneToSD(String fileName = "/_id"){
-  
-  String content = readMemoryId();  
+void cloneToSD(String fileName = "/id.txt"){
+  Serial.println("1");
+  String content = readMemoryId(); 
+  Serial.println("2"); 
   writeFileSD(fileName, content, "w");
+  Serial.println("3");
   readFileSD(fileName);
-
+  Serial.println("4");
 }
 
 /*
@@ -250,10 +254,12 @@ void readAllCopied(){
 
 }
 
+
 ////////////////////////////////
 
 void setup() {
   String Package = "{\"s\":[[{\"i\":1,\"d\":25.3},{\"i\":2,\"d\":22.3},{\"i\":3,\"d\":24}]]}";
+  beginMemory();
   Serial.begin(9600);
   Serial.print("Starting SD...");
   if (!SD.begin(5)) {
@@ -263,9 +269,9 @@ void setup() {
   Serial.println("Success initialization");
   delay(5000);
   
-  removeFileSD("/Packages.csv");
+  //removeFileSD("/Packages.csv");
   
-  writeCSV(Package);
+  //writeCSV(Package);
   //removeFileSD("/_id");
   
   /**
@@ -293,16 +299,16 @@ void loop() {
   
   writeFileSD( "/counter.dat" , character, "w");
   readFileSD( "/counter.dat");*/
-  readFileSD("/Packages.csv");
+  //readFileSD("/Packages.csv");
   //removeFileSD("/counter.dat");
   /**
   writeFileSD("/Config/Config.json","{\"ds\":1200}", "a");
   readFileSD("/Config/Config.json");
   */
-  /**
+  
   cloneToSD();
   readFileSD("/_id");
-  */
+  
   //removeFileSD("/Config/Config.json");
   delay(5000);
 }
