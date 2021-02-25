@@ -127,7 +127,7 @@ void writeCSV(String content){
   unsigned int first;
   unsigned int last;
   
-  myFile = SD.open("/Packages.txt", "a");
+  myFile = SD.open("/Packages.csv", "a");
   content = content.substring(6);
 
   while(strchr(content.c_str(), __TOP_LIMIT__) != NULL){
@@ -263,7 +263,7 @@ void setup() {
   Serial.println("Success initialization");
   delay(5000);
   
-  removeFileSD("/Packages.txt");
+  removeFileSD("/Packages.csv");
   
   writeCSV(Package);
   //removeFileSD("/_id");
@@ -293,7 +293,7 @@ void loop() {
   
   writeFileSD( "/counter.dat" , character, "w");
   readFileSD( "/counter.dat");*/
-  readFileSD("/Packages.txt");
+  readFileSD("/Packages.csv");
   //removeFileSD("/counter.dat");
   /**
   writeFileSD("/Config/Config.json","{\"ds\":1200}", "a");
