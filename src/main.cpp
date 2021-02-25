@@ -175,9 +175,8 @@ String readMemoryPeripherals(){
 */
 void dataLogUpdate(String fileName, DynamicJsonDocument doc){
   myFile = SD.open(fileName, "a");
-  myFile.println("");
   serializeJson(doc,myFile);
-
+  myFile.println("");
   myFile.close();
 }
 
