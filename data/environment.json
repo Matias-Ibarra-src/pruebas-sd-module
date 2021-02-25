@@ -1,0 +1,9 @@
+{
+    "apn": "em",
+    "apnUser": "",
+    "apnPass": "",
+    "ssid": "Casa 123",
+    "password": "11248325",
+    "serverUrl": "ec2-18-231-197-107.sa-east-1.compute.amazonaws.com",
+    "serverPort": 4000
+}
